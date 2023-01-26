@@ -1,4 +1,4 @@
-using AdsScrapper.Common.Enums;
+using AdsScrapper.CarAds.Common.Enums;
 using HtmlAgilityPack;
 
 namespace AdsScrapper.CarAds.Common;
@@ -16,7 +16,7 @@ public static class CommonMethods
     // Create file with no ads description.
     public static void WriteNoAdsToFile(AdType adType, HtmlDocument loadedDocument)
     {
-        var filePath = adType + "_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".txt";
+        var filePath = adType + "_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".json";
         using var w = File.AppendText(filePath);
         w.WriteLine("NO DATA. Loaded document below...");
         w.WriteLine(loadedDocument.ParsedText);

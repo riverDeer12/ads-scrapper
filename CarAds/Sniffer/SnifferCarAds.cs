@@ -1,9 +1,8 @@
 using AdsScrapper.CarAds.Common;
-using AdsScrapper.Common;
-using AdsScrapper.Common.Enums;
+using AdsScrapper.CarAds.Common.Enums;
 using HtmlAgilityPack;
 
-namespace AdsScrapper.Sniffer;
+namespace AdsScrapper.CarAds.Sniffer;
 
 public static class SnifferCarAds
 {
@@ -76,8 +75,8 @@ public static class SnifferCarAds
     // Write car ads to .txt file. 
     private static void WriteToFile(List<HtmlNode> carAds)
     {
-        var filePath = AdType.Sniffer + "_" +
-                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".txt";
+        var filePath = AdType.Sniffer + "/" + AdType.Sniffer + "_" +
+                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".json";
 
         using var w = File.AppendText(filePath);
 

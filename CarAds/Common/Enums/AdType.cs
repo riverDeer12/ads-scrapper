@@ -1,4 +1,4 @@
-namespace AdsScrapper.Common.Enums;
+namespace AdsScrapper.CarAds.Common.Enums;
 
 public enum AdType
 {

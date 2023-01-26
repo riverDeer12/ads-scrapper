@@ -1,7 +1,6 @@
-using AdsScrapper.Index;
-using AdsScrapper.Sniffer;
+using AdsScrapper.CarAds.Index;
 
-namespace AdsScrapper;
+namespace AdsScrapper.CarAds;
 
 public static class CarAdsScrapper
 {

@@ -1,12 +1,8 @@
-using System.Reflection.Metadata;
-using System.Text.Json.Nodes;
 using AdsScrapper.CarAds.Common;
-using AdsScrapper.CarAds.Index;
-using AdsScrapper.Common;
-using AdsScrapper.Common.Enums;
+using AdsScrapper.CarAds.Common.Enums;
 using HtmlAgilityPack;
 
-namespace AdsScrapper.Index;
+namespace AdsScrapper.CarAds.Index;
 
 public static class IndexCarAds
 {
@@ -63,18 +59,15 @@ public static class IndexCarAds
     // Write car ads to .txt file. 
     private static void WriteToFile(List<HtmlNode> carAds)
     {
-        var filePath = AdType.Index + "_" +
-                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".txt";
+        var filePath = AdType.Index + "/" + AdType.Index + "_" +
+                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".json";
 
         using var w = File.AppendText(filePath);
 
-        foreach (var ad in carAds)
-        {
-            var adTranslator = new CarAdsTranslator(ad);
+        var adTranslator = new CarAdsTranslator(carAds);
 
-            var carAd = adTranslator.GetJson();
-            
-            w.WriteLine(carAd);
-        }
+        var carAd = adTranslator.GetJson();
+
+        w.WriteLine(carAd);
     }
 }
