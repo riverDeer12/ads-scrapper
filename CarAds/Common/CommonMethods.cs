@@ -1,7 +1,7 @@
 using AdsScrapper.Common.Enums;
 using HtmlAgilityPack;
 
-namespace AdsScrapper.Common;
+namespace AdsScrapper.CarAds.Common;
 
 public static class CommonMethods
 {

@@ -1,3 +1,4 @@
+using AdsScrapper.CarAds.Common;
 using AdsScrapper.Common;
 using AdsScrapper.Common.Enums;
 using HtmlAgilityPack;

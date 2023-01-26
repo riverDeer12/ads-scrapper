@@ -1,4 +1,7 @@
 using System.Reflection.Metadata;
+using System.Text.Json.Nodes;
+using AdsScrapper.CarAds.Common;
+using AdsScrapper.CarAds.Index;
 using AdsScrapper.Common;
 using AdsScrapper.Common.Enums;
 using HtmlAgilityPack;
@@ -29,7 +32,8 @@ public static class IndexCarAds
     {
         try
         {
-            var rootElement = doc.DocumentNode.Descendants("div")
+            var rootElement = doc.DocumentNode
+                .Descendants("div")
                 .FirstOrDefault(x => x.HasClass("results"));
 
             return rootElement != null;
@@ -44,7 +48,8 @@ public static class IndexCarAds
     // Extract car ads from car ads wrappers
     private static List<HtmlNode> ExtractAds(HtmlDocument doc)
     {
-        var rootElement = doc.DocumentNode.Descendants("div")
+        var rootElement = doc.DocumentNode
+            .Descendants("div")
             .FirstOrDefault(x => x.HasClass("results"));
 
         if (rootElement == null) return new List<HtmlNode>();
@@ -65,20 +70,10 @@ public static class IndexCarAds
 
         foreach (var ad in carAds)
         {
-            var titleText = ad
-                .Descendants("span").FirstOrDefault(d => d.Attributes["class"].Value
-                    .Contains("title"))?.InnerText;
+            var adTranslator = new CarAdsTranslator(ad);
 
-            var description = ad
-                .Descendants("ul")
-                .FirstOrDefault(d => d.Attributes["class"].Value
-                    .Contains("tags hide-on-small-only"))
-                ?.InnerText;
-
-            var formattedDescription = description?.Trim();
-
-            var carAd = $"Naziv: {titleText}, Opis: {formattedDescription} ";
-
+            var carAd = adTranslator.GetJson();
+            
             w.WriteLine(carAd);
         }
     }
