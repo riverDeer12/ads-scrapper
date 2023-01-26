@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using AdsScrapper.Common;
 using AdsScrapper.Common.Enums;
 using HtmlAgilityPack;
@@ -10,53 +11,48 @@ public static class IndexCarAds
     {
         var doc = CommonMethods.GetDocument(carUrl);
 
-        var carAdsWrappers = GetAdsWrappers(doc);
-
-        if (!carAdsWrappers.Any())
+        if (!RootElementCheck(doc))
         {
-            CommonMethods.WriteNoAdsToFile(AdType.Index);
+            CommonMethods.WriteNoAdsToFile(AdType.Index, doc);
             return;
         }
 
-        var carAds = ExtractAds(carAdsWrappers);
+        var carAds = ExtractAds(doc);
 
         WriteToFile(carAds);
     }
 
-    // Get car ads wrappers
-    // Car ads will be extracted from wrappers
-    private static List<HtmlNode> GetAdsWrappers(HtmlDocument doc)
+    // Check if root element for ads exists
+    // In most cases there is situation where
+    // IP is blocked so HTMl content is not loaded properly.
+    private static bool RootElementCheck(HtmlDocument doc)
     {
-        var adsWrappers = doc.DocumentNode
-            .Descendants("div")
-            .Where(d => d.Attributes["class"].Value
-                .Contains("results"))?.ToList()
-            .ToList();
-
-        if (adsWrappers == null || !adsWrappers.Any())
+        try
         {
-            return new List<HtmlNode>();
-        }
+            var rootElement = doc.DocumentNode.Descendants("div")
+                .FirstOrDefault(x => x.HasClass("results"));
 
-        return adsWrappers;
+            return rootElement != null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            return false;
+        }
     }
 
     // Extract car ads from car ads wrappers
-    private static List<HtmlNode> ExtractAds(List<HtmlNode> carAdsWrappers)
+    private static List<HtmlNode> ExtractAds(HtmlDocument doc)
     {
-        var carAds = new List<HtmlNode>();
+        var rootElement = doc.DocumentNode.Descendants("div")
+            .FirstOrDefault(x => x.HasClass("results"));
 
-        foreach (var wrapper in carAdsWrappers)
-        {
-            var wrapperCarAds = wrapper
-                .Descendants("div")
-                .Where(d => d.Attributes["class"].Value
-                    .Contains("OglasiRezHolder")).ToList();
+        if (rootElement == null) return new List<HtmlNode>();
 
-            carAds.AddRange(wrapperCarAds);
-        }
-
-        return carAds;
+        return rootElement
+            .Descendants("div")
+            .Where(x => x.HasClass("OglasiRezHolder"))
+            .ToList();
     }
 
     // Write car ads to .txt file. 

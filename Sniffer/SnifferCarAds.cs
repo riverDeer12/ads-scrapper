@@ -8,13 +8,13 @@ public static class SnifferCarAds
 {
     public static void GetAds(string carUrl)
     {
-        var doc = CommonMethods.GetDocument(carUrl);
+        var loadedDocument = CommonMethods.GetDocument(carUrl);
 
-        var carAdsWrappers = GetAdWrappers(doc);
+        var carAdsWrappers = GetAdWrappers(loadedDocument);
 
         if (!carAdsWrappers.Any())
         {
-            CommonMethods.WriteNoAdsToFile(AdType.Sniffer);
+            CommonMethods.WriteNoAdsToFile(AdType.Sniffer, loadedDocument);
             return;
         }
 

@@ -14,10 +14,11 @@ public static class CommonMethods
     }
 
     // Create file with no ads description.
-    public static void WriteNoAdsToFile(AdType adType)
+    public static void WriteNoAdsToFile(AdType adType, HtmlDocument loadedDocument)
     {
-        var filePath = adType + "_" + DateTime.Now.ToString("ddMMyyyy") + ".txt";
+        var filePath = adType + "_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".txt";
         using var w = File.AppendText(filePath);
-        w.WriteLine("NO DATA.");
+        w.WriteLine("NO DATA. Loaded document below...");
+        w.WriteLine(loadedDocument.ParsedText);
     }
 }
