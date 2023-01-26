@@ -1,4 +1,5 @@
 using AdsScrapper.Common;
+using AdsScrapper.Common.Enums;
 using HtmlAgilityPack;
 
 namespace AdsScrapper.Sniffer;
@@ -11,6 +12,12 @@ public static class SnifferCarAds
 
         var carAdsWrappers = GetAdWrappers(doc);
 
+        if (!carAdsWrappers.Any())
+        {
+            CommonMethods.WriteNoAdsToFile(AdType.Sniffer);
+            return;
+        }
+
         var carAds = ExtractAds(carAdsWrappers);
 
         WriteToFile(carAds);
@@ -22,18 +29,26 @@ public static class SnifferCarAds
     {
         var finalAdWrappers = new List<HtmlNode>();
 
-        var featuredAdWrappers = doc.DocumentNode
-            .Descendants("li")
-            .Where(d => d.Attributes["class"].Value
-                .Contains("EntityList-item EntityList-item--VauVau"));
-
         var regularAdWrappers = doc.DocumentNode
             .Descendants("li")
             .Where(d => d.Attributes["class"].Value
-                .Contains("EntityList-item EntityList-item--Regular")).ToList();
+                .Contains("EntityList-item EntityList-item--Regular"))?.ToList();
 
-        finalAdWrappers.AddRange(featuredAdWrappers);
-        
+        if (regularAdWrappers == null || !regularAdWrappers.Any())
+        {
+            return new List<HtmlNode>();
+        }
+
+        var featuredAdWrappers = doc.DocumentNode
+            .Descendants("li")
+            .Where(d => d.Attributes["class"].Value
+                .Contains("EntityList-item EntityList-item--VauVau"))?.ToList();
+
+        if (featuredAdWrappers != null && featuredAdWrappers.Any())
+        {
+            finalAdWrappers.AddRange(featuredAdWrappers);
+        }
+
         finalAdWrappers.AddRange(regularAdWrappers);
 
         return finalAdWrappers;
@@ -60,9 +75,8 @@ public static class SnifferCarAds
     // Write car ads to .txt file. 
     private static void WriteToFile(List<HtmlNode> carAds)
     {
-        var timestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
-
-        var filePath = "njuskalo_oglasi_" + timestamp + ".txt";
+        var filePath = AdType.Sniffer + "_" +
+                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".txt";
 
         using var w = File.AppendText(filePath);
 

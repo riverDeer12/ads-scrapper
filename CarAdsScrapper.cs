@@ -16,7 +16,7 @@ public static class CarAdsScrapper
      */
     public static void Run()
     {
-        SnifferCarAds.GetAds(NjuskaloGolf7Url);
-        // IndexCarAds.GetAds(IndexGolf7Url);
+        // SnifferCarAds.GetAds(NjuskaloGolf7Url);
+        IndexCarAds.GetAds(IndexGolf7Url);
     }
 }
