@@ -1,15 +1,14 @@
-using System.Text.Json;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 
-namespace AdsScrapper.CarAds.Index;
+namespace AdsScrapper.CarAds.Sniffer;
 
-public class CarAdsTranslator
+public class SnifferAdTranslator
 {
     private readonly List<CarAd> _carAds = new();
     private readonly List<HtmlNode> _loadedAds;
 
-    public CarAdsTranslator(List<HtmlNode> loadedAds)
+    public SnifferAdTranslator(List<HtmlNode> loadedAds)
     {
         _loadedAds = loadedAds;
 

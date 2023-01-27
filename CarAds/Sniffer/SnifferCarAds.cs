@@ -31,8 +31,7 @@ public static class SnifferCarAds
 
         var regularAdWrappers = doc.DocumentNode
             .Descendants("li")
-            .Where(d => d.Attributes["class"].Value
-                .Contains("EntityList-item EntityList-item--Regular"))?.ToList();
+            .Where(d => d.HasClass("EntityList-item EntityList-item--Regular"))?.ToList();
 
         if (regularAdWrappers == null || !regularAdWrappers.Any())
         {
@@ -41,8 +40,7 @@ public static class SnifferCarAds
 
         var featuredAdWrappers = doc.DocumentNode
             .Descendants("li")
-            .Where(d => d.Attributes["class"].Value
-                .Contains("EntityList-item EntityList-item--VauVau"))?.ToList();
+            .Where(d => d.HasClass("EntityList-item EntityList-item--VauVau"))?.ToList();
 
         if (featuredAdWrappers != null && featuredAdWrappers.Any())
         {
@@ -63,10 +61,9 @@ public static class SnifferCarAds
         {
             var wrapperCarAds = wrapper
                 .Descendants("article")
-                .Where(d => d.Attributes["class"].Value
-                    .Contains("entity-body cf")).ToList();
+                .Where(d => d.HasClass("entity-body cf"))?.ToList();
 
-            carAds.AddRange(wrapperCarAds);
+            if (wrapperCarAds != null) carAds.AddRange(wrapperCarAds);
         }
 
         return carAds;
@@ -88,8 +85,7 @@ public static class SnifferCarAds
 
             var description = ad
                 .Descendants("div")
-                .FirstOrDefault(d => d.Attributes["class"].Value
-                    .Contains("entity-description-main"))
+                .FirstOrDefault(x => x.HasClass("entity-description-main"))
                 ?.InnerText;
 
             var formattedDescription = description?.Trim();

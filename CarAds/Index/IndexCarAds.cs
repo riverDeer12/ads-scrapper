@@ -64,7 +64,7 @@ public static class IndexCarAds
 
         using var w = File.AppendText(filePath);
 
-        var adTranslator = new CarAdsTranslator(carAds);
+        var adTranslator = new IndexAdTranslator(carAds);
 
         var carAd = adTranslator.GetJson();
 
