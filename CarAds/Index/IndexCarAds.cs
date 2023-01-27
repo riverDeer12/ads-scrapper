@@ -21,9 +21,11 @@ public static class IndexCarAds
         WriteToFile(carAds);
     }
 
-    // Check if root element for ads exists
-    // In most cases there is situation where
-    // IP is blocked so HTMl content is not loaded properly.
+    /**
+     * Check if root element for ads exists
+     * In most cases there is situation where
+     * IP is blocked so HTMl content is not loaded properly.
+     */
     private static bool RootElementCheck(HtmlDocument doc)
     {
         try
@@ -41,7 +43,9 @@ public static class IndexCarAds
         }
     }
 
-    // Extract car ads from car ads wrappers
+    /**
+     * Extract car ads from car ads wrappers.
+     */
     private static List<HtmlNode> ExtractAds(HtmlDocument doc)
     {
         var rootElement = doc.DocumentNode
@@ -56,7 +60,9 @@ public static class IndexCarAds
             .ToList();
     }
 
-    // Write car ads to .txt file. 
+    /**
+     * Write car ads to .txt file.
+     */ 
     private static void WriteToFile(List<HtmlNode> carAds)
     {
         var filePath = AdType.Index + "/" + AdType.Index + "_" +
@@ -64,7 +70,7 @@ public static class IndexCarAds
 
         using var w = File.AppendText(filePath);
 
-        var adTranslator = new IndexAdTranslator(carAds);
+        var adTranslator = new IndexCarAdTranslator(carAds);
 
         var carAd = adTranslator.GetJson();
 

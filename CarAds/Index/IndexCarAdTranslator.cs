@@ -1,15 +1,14 @@
-using System.Text.Json;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 
 namespace AdsScrapper.CarAds.Index;
 
-public class IndexAdTranslator
+public class IndexCarAdTranslator
 {
     private readonly List<CarAd> _carAds = new();
     private readonly List<HtmlNode> _loadedAds;
 
-    public IndexAdTranslator(List<HtmlNode> loadedAds)
+    public IndexCarAdTranslator(List<HtmlNode> loadedAds)
     {
         _loadedAds = loadedAds;
 
@@ -39,29 +38,27 @@ public class IndexAdTranslator
                 ?.InnerText
                 .Trim();
 
-            var header = ad
-                .Descendants("ul")
-                .FirstOrDefault(d => d.HasClass("tags hide-on-small-only"));
+            if (carAd.Title == null) continue;
 
-            if (header == null)
+            var descriptionContainer = ad
+                .Descendants("ul")?.ToList();
+
+            if (descriptionContainer == null || !descriptionContainer.Any())
             {
                 _carAds.Add(carAd);
                 continue;
             }
 
-            var description = header.ChildNodes.Descendants("ul").FirstOrDefault();
+            var descriptionItems = descriptionContainer[0]
+                .Descendants("li").ToList();
 
-            if (description == null)
-            {
-                _carAds.Add(carAd);
-                continue;
-            }
-
-            var descriptionItems = description.Descendants("li").ToList();
-
-            carAd.Year = descriptionItems[0].InnerText;
-            carAd.Mileage = descriptionItems[1].InnerText;
-            carAd.Power = descriptionItems[3].InnerText;
+            carAd.Year = descriptionItems[0].InnerText.Trim();
+            carAd.Mileage = descriptionItems.Count > 2
+                ? descriptionItems[1].InnerText.Trim().Replace("\r\n", string.Empty)
+                : "No data about mileage.";
+            carAd.Power = descriptionItems.Count > 3
+                ? descriptionItems[3].InnerText.Trim().Replace("\r\n", string.Empty)
+                : "No data about power.";
             carAd.Link = GetLink(ad);
 
             _carAds.Add(carAd);

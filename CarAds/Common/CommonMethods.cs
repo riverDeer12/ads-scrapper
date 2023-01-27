@@ -1,10 +1,13 @@
 using AdsScrapper.CarAds.Common.Enums;
+using AdsScrapper.CarAds.Index;
+using AdsScrapper.CarAds.Sniffer;
 using HtmlAgilityPack;
 
 namespace AdsScrapper.CarAds.Common;
 
 public static class CommonMethods
 {
+    
     // Make request to wanted html document file.
     public static HtmlDocument GetDocument(string url)
     {
@@ -13,7 +16,9 @@ public static class CommonMethods
         return doc;
     }
 
-    // Create file with no ads description.
+    /**
+     * Create file with no ads description.
+     */
     public static void WriteNoAdsToFile(AdType adType, HtmlDocument loadedDocument)
     {
         var filePath = adType + "_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".json";

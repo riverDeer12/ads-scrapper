@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace AdsScrapper.CarAds.Sniffer;
 
-public class SnifferAdTranslator
+public class SnifferCarAdTranslator
 {
     private readonly List<CarAd> _carAds = new();
     private readonly List<HtmlNode> _loadedAds;
 
-    public SnifferAdTranslator(List<HtmlNode> loadedAds)
+    public SnifferCarAdTranslator(List<HtmlNode> loadedAds)
     {
         _loadedAds = loadedAds;
 
