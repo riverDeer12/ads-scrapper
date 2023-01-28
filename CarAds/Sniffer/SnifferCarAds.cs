@@ -1,3 +1,4 @@
+using System.Configuration;
 using AdsScrapper.CarAds.Common;
 using AdsScrapper.CarAds.Common.Enums;
 using HtmlAgilityPack;
@@ -6,9 +7,15 @@ namespace AdsScrapper.CarAds.Sniffer;
 
 public static class SnifferCarAds
 {
-    public static void GetAds(string carUrl)
+    private static CarType _carType;
+
+    private static readonly string CarUrl = ConfigurationManager.AppSettings["Sniffer" + _carType]!;
+
+    public static void GetAds(CarType carType)
     {
-        var loadedDocument = CommonMethods.GetDocument(carUrl);
+        _carType = carType;
+
+        var loadedDocument = CommonMethods.GetDocument(CarUrl);
 
         var carAdsWrappers = GetAdWrappers(loadedDocument);
 
@@ -72,8 +79,7 @@ public static class SnifferCarAds
     // Write car ads to .txt file. 
     private static void WriteToFile(List<HtmlNode> carAds)
     {
-        var filePath = AdType.Sniffer + "/" + AdType.Sniffer + "_" +
-                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".json";
+        var filePath = CommonMethods.GenerateFilePath(AdType.Sniffer, _carType);
 
         using var w = File.AppendText(filePath);
 

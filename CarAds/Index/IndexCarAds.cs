@@ -1,3 +1,4 @@
+using System.Configuration;
 using AdsScrapper.CarAds.Common;
 using AdsScrapper.CarAds.Common.Enums;
 using HtmlAgilityPack;
@@ -6,17 +7,23 @@ namespace AdsScrapper.CarAds.Index;
 
 public static class IndexCarAds
 {
-    public static void GetAds(string carUrl)
-    {
-        var doc = CommonMethods.GetDocument(carUrl);
+    private static CarType _carType;
 
-        if (!RootElementCheck(doc))
+    private static readonly string CarUrl = ConfigurationManager.AppSettings["Index" + _carType]!;
+
+    public static void GetAds(CarType carType)
+    {
+        _carType = carType;
+
+        var loadedDocument = CommonMethods.GetDocument(CarUrl);
+
+        if (!RootElementCheck(loadedDocument))
         {
-            CommonMethods.WriteNoAdsToFile(AdType.Index, doc);
+            CommonMethods.WriteNoAdsToFile(AdType.Index, loadedDocument);
             return;
         }
 
-        var carAds = ExtractAds(doc);
+        var carAds = ExtractAds(loadedDocument);
 
         WriteToFile(carAds);
     }
@@ -65,8 +72,7 @@ public static class IndexCarAds
      */ 
     private static void WriteToFile(List<HtmlNode> carAds)
     {
-        var filePath = AdType.Index + "/" + AdType.Index + "_" +
-                       DateTime.Now.ToString("ddMMyyyyHHmmss") + ".json";
+        var filePath = CommonMethods.GenerateFilePath(AdType.Index, _carType);
 
         using var w = File.AppendText(filePath);
 

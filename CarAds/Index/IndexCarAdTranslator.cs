@@ -6,7 +6,10 @@ namespace AdsScrapper.CarAds.Index;
 public class IndexCarAdTranslator
 {
     private readonly List<CarAd> _carAds = new();
+
     private readonly List<HtmlNode> _loadedAds;
+
+    private CarAd _carAdInProcess = new();
 
     public IndexCarAdTranslator(List<HtmlNode> loadedAds)
     {
@@ -30,44 +33,56 @@ public class IndexCarAdTranslator
     {
         foreach (var ad in _loadedAds)
         {
-            var carAd = new CarAd();
-
-            carAd.Title = ad
-                .Descendants("span")
-                .FirstOrDefault(d => d.HasClass("title"))
-                ?.InnerText
-                .Trim();
-
-            if (carAd.Title == null) continue;
-
-            var descriptionContainer = ad
-                .Descendants("ul")?.ToList();
-
-            if (descriptionContainer == null || !descriptionContainer.Any())
+            _carAdInProcess = new CarAd
             {
-                _carAds.Add(carAd);
-                continue;
-            }
+                Title = GetTitle(ad),
+                Link = GetLink(ad),
+                Price = GetPrice(ad)
+            };
 
-            var descriptionItems = descriptionContainer[0]
-                .Descendants("li").ToList();
+            ManageDescription(ad);
 
-            carAd.Year = descriptionItems[0].InnerText.Trim();
-            carAd.Mileage = descriptionItems.Count > 2
-                ? descriptionItems[1].InnerText.Trim().Replace("\r\n", string.Empty)
-                : "No data about mileage.";
-            carAd.Power = descriptionItems.Count > 3
-                ? descriptionItems[3].InnerText.Trim().Replace("\r\n", string.Empty)
-                : "No data about power.";
-            carAd.Link = GetLink(ad);
-
-            _carAds.Add(carAd);
+            _carAds.Add(_carAdInProcess);
         }
     }
 
     /**
-     * Get car ad link for additional
-     * info about ad.
+     * Check if car ad description
+     * is available.
+     */
+    private void ManageDescription(HtmlNode ad)
+    {
+        var descriptionContainer = ad.Descendants("ul")
+            .FirstOrDefault(x => x.HasClass("tags hide-on-small-only"));
+
+        if (descriptionContainer == null) return;
+
+        GetDescriptionItems(ad);
+    }
+
+    /**
+     * Run additional getters
+     * for description items.
+     */
+    private void GetDescriptionItems(HtmlNode ad)
+    {
+        GetMileage(ad);
+        GetYear(ad);
+        GetPower(ad);
+    }
+
+    /**
+     * Helper method for getting
+     * more clear ad data about car mileage.
+     */
+    private string? GetMileage(HtmlNode ad)
+    {
+        return ad.InnerText.Trim().Replace("\r\n", string.Empty);
+    }
+
+    /**
+     * Helper method for getting
+     * external link to more details about car.
      */
     private static string? GetLink(HtmlNode ad)
     {
@@ -76,5 +91,46 @@ public class IndexCarAdTranslator
             .FirstOrDefault(x => x.HasClass("result"));
 
         return carLinkElement == null ? string.Empty : carLinkElement.Attributes["href"].Value;
+    }
+
+    /**
+     * Helper method for getting
+     * more clear ad data about car power.
+     */
+    private static string? GetPower(HtmlNode ad)
+    {
+        return ad.InnerText.Trim().Replace("\r\n", string.Empty);
+    }
+
+    /**
+     * Helper method for getting car ad title.
+     */
+    private static string? GetTitle(HtmlNode ad)
+    {
+        return ad.Descendants("span")
+            .FirstOrDefault(d => d.HasClass("title"))
+            ?.InnerText
+            .Trim();
+    }
+
+    /**
+     * Helper method for getting
+     * more clear ad data about car year
+     * when car is manufactured.
+     */
+    private static string? GetYear(HtmlNode ad)
+    {
+        return ad.InnerText.Trim().Replace("\r\n", string.Empty);
+    }
+
+    /**
+     * Helper method for getting
+     * more clear ad data about car price.
+     */
+    private static string? GetPrice(HtmlNode ad)
+    {
+        var priceContainer = ad.Descendants("ul").FirstOrDefault(x => x.HasClass("info"));
+
+        return priceContainer == null ? string.Empty : priceContainer.InnerText.Trim();
     }
 }

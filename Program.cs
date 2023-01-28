@@ -1,4 +1,3 @@
-﻿using AdsScrapper;
-using AdsScrapper.CarAds;
+﻿using AdsScrapper.CarAds;
 
-CarAdsScrapper.Run();
+CarAdsScrapper.Run(CarType.Golf7);
