@@ -19,65 +19,61 @@ public class IndexCarAdTranslator
     }
 
     /**
-     * Convert car ad into
+     * Convert car container into
      * JSON object.
      */
     public string GetJson() =>
         JsonConvert.SerializeObject(_carAds);
 
     /*
-     * Process incoming HTML ad document
+     * Process incoming HTML container document
      * into class properties.
      */
     private void ProcessAds()
     {
         foreach (var ad in _loadedAds)
         {
-            _carAdInProcess = new CarAd
-            {
-                Title = GetTitle(ad),
-                Link = GetLink(ad),
-                Price = GetPrice(ad)
-            };
+            _carAdInProcess = new CarAd();
 
-            ManageDescription(ad);
+            GetTitle(ad);
+
+            GetLink(ad);
+
+            GetPrice(ad);
+
+            GetDescription(ad);
 
             _carAds.Add(_carAdInProcess);
         }
     }
 
     /**
-     * Check if car ad description
+     * Check if car container description
      * is available.
      */
-    private void ManageDescription(HtmlNode ad)
+    private void GetDescription(HtmlNode ad)
     {
-        var descriptionContainer = ad.Descendants("ul")
-            .FirstOrDefault(x => x.HasClass("tags hide-on-small-only"));
+        var descriptionContainer = ad.Descendants("ul")?.ToList();
 
-        if (descriptionContainer == null) return;
+        if (descriptionContainer == null || !descriptionContainer.Any()) return;
 
-        GetDescriptionItems(ad);
+        GetDescriptionItems(descriptionContainer[0]);
     }
 
     /**
      * Run additional getters
      * for description items.
      */
-    private void GetDescriptionItems(HtmlNode ad)
+    private void GetDescriptionItems(HtmlNode container)
     {
-        GetMileage(ad);
-        GetYear(ad);
-        GetPower(ad);
-    }
+        var containerItems = container
+            .Descendants("li")?.ToList();
 
-    /**
-     * Helper method for getting
-     * more clear ad data about car mileage.
-     */
-    private string? GetMileage(HtmlNode ad)
-    {
-        return ad.InnerText.Trim().Replace("\r\n", string.Empty);
+        if (containerItems == null || !containerItems.Any()) return;
+
+        GetMileage(containerItems);
+        GetYear(containerItems);
+        GetPower(containerItems);
     }
 
     /**
@@ -95,19 +91,56 @@ public class IndexCarAdTranslator
 
     /**
      * Helper method for getting
-     * more clear ad data about car power.
+     * more clear container data about car mileage.
      */
-    private static string? GetPower(HtmlNode ad)
+    private void GetMileage(IReadOnlyList<HtmlNode> container)
     {
-        return ad.InnerText.Trim().Replace("\r\n", string.Empty);
+        var mileageContainer = container[1];
+
+        var validMileageContainer = mileageContainer.InnerText.Contains("km");
+
+        if (!validMileageContainer) return;
+
+        _carAdInProcess.Mileage = mileageContainer.InnerText;
     }
 
     /**
-     * Helper method for getting car ad title.
+     * Helper method for getting
+     * more clear container data about car year
+     * when car is manufactured.
      */
-    private static string? GetTitle(HtmlNode ad)
+    private void GetYear(IReadOnlyList<HtmlNode> container)
     {
-        return ad.Descendants("span")
+        var yearContainer = container[0];
+
+        var validYearContainer = yearContainer.InnerText.Contains("Godište");
+
+        if (!validYearContainer) return;
+
+        _carAdInProcess.Year = yearContainer.InnerText;
+    }
+
+    /**
+     * Helper method for getting
+     * more clear container data about car power.
+     */
+    private void GetPower(IReadOnlyList<HtmlNode> container)
+    {
+        var powerContainer = container[3];
+
+        var validPowerContainer = powerContainer.InnerText.Contains("kW");
+
+        if (!validPowerContainer) return;
+
+        _carAdInProcess.Power = powerContainer.InnerText;
+    }
+
+    /**
+     * Helper method for getting car container title.
+     */
+    private void GetTitle(HtmlNode ad)
+    {
+        _carAdInProcess.Title = ad.Descendants("span")
             .FirstOrDefault(d => d.HasClass("title"))
             ?.InnerText
             .Trim();
@@ -115,22 +148,21 @@ public class IndexCarAdTranslator
 
     /**
      * Helper method for getting
-     * more clear ad data about car year
-     * when car is manufactured.
+     * more clear container data about car price.
      */
-    private static string? GetYear(HtmlNode ad)
+    private void GetPrice(HtmlNode ad)
     {
-        return ad.InnerText.Trim().Replace("\r\n", string.Empty);
-    }
+        var priceContainer = ad.Descendants("ul")?.ToList();
 
-    /**
-     * Helper method for getting
-     * more clear ad data about car price.
-     */
-    private static string? GetPrice(HtmlNode ad)
-    {
-        var priceContainer = ad.Descendants("ul").FirstOrDefault(x => x.HasClass("info"));
+        if (priceContainer == null || !priceContainer.Any()) return;
 
-        return priceContainer == null ? string.Empty : priceContainer.InnerText.Trim();
+        var innerPriceContainer =
+            priceContainer[1].Descendants("span").ToList();
+
+        if (innerPriceContainer != null || !innerPriceContainer.Any()) return;
+
+        var priceSpan = innerPriceContainer.FirstOrDefault(x => x.HasClass("price"));
+
+        _carAdInProcess.Price = priceSpan?.InnerText;
     }
 }

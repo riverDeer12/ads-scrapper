@@ -68,7 +68,7 @@ public static class IndexCarAds
     }
 
     /**
-     * Write car ads to .txt file.
+     * Write car ads to .json file.
      */ 
     private static void WriteToFile(List<HtmlNode> carAds)
     {

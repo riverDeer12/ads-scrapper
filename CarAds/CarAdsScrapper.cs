@@ -12,8 +12,8 @@ public static class CarAdsScrapper
      */
     public static void Run(CarType carType)
     {
-        SnifferCarAds.GetAds(carType);
+        // SnifferCarAds.GetAds(carType);
         
-        // IndexCarAds.GetAds(carType);
+        IndexCarAds.GetAds(carType);
     }
 }
